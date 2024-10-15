@@ -1,8 +1,9 @@
-export async function main() {
+export async function main(event: any) {
+  console.log("got id", event.productId);
   return {
     message: "Products fetched successfully",
     success: true,
-    data: handleProductList(),
+    data: handleGetProductById(parseInt(event.productId)),
   };
 }
 
@@ -45,6 +46,6 @@ const data = [
   },
 ];
 
-function handleProductList() {
-  return data;
+function handleGetProductById(id: number) {
+  return data.find((item) => item.id === id);
 }

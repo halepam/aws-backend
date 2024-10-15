@@ -42,6 +42,15 @@ export class ProductServiceStack extends cdk.Stack {
       })
     );
 
+    const lambdaProductByIdFunction = new lambda.Function(
+      this,
+      "lambda-product-by-id",
+      getLambdaConfig({
+        handler: "handler.main",
+        pathToResource: "./lambda/get-product/",
+      })
+    );
+
     const api = new apigateway.RestApi(this, "products-api", {
       restApiName: "Products API Gateway",
       description: "This API serves the Lambda functions for products.",
@@ -59,6 +68,21 @@ export class ProductServiceStack extends cdk.Stack {
       }
     );
 
+    const productByIdLambdaIntegration = new apigateway.LambdaIntegration(
+      lambdaProductByIdFunction,
+      {
+        requestTemplates: {
+           "application/json": `{ "productId": "$input.params('productId')" }`
+        },
+        integrationResponses: [
+          {
+            statusCode: "200",
+          },
+        ],
+        proxy: false,
+      }
+    );
+
     // Create a resource /products and GET request under it
     const productsResource = api.root.addResource("products");
     // On this resource attach a GET method which pass reuest to our Lambda function
@@ -66,7 +90,18 @@ export class ProductServiceStack extends cdk.Stack {
       methodResponses: [{ statusCode: "200" }],
     });
 
+    const productByIdResource = productsResource.addResource("{productId}");
+
+    productByIdResource.addMethod("GET", productByIdLambdaIntegration, {
+      methodResponses: [{ statusCode: "200" }],
+    });
+
     productsResource.addCorsPreflight({
+      allowOrigins: ["*"],
+      allowMethods: ["GET", "OPTIONS"],
+    });
+
+    productByIdResource.addCorsPreflight({
       allowOrigins: ["*"],
       allowMethods: ["GET", "OPTIONS"],
     });
