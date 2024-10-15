@@ -1,8 +1,14 @@
-# Welcome to your CDK TypeScript project
+# Task 3 Submission
 
-This is a blank project for CDK development with TypeScript.
+## Frontend Integration
+Client is integrated and available through: https://d3j5zyjcx28byh.cloudfront.net/
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+## API Gateway and Lambda Functions
+API URI is https://rp0yrpnlxj.execute-api.us-east-1.amazonaws.com/prod
+Endpoints are:
+- `getProductList`: `/products`
+- `getProductById`: `/{productId}`
+
 
 ## Useful commands
 
