@@ -67,8 +67,8 @@ export class ProductServiceStack extends cdk.Stack {
     });
 
     productsResource.addCorsPreflight({
-      allowOrigins: ["https://d1izgcw2dq3ahs.cloudfront.net"],
-      allowMethods: ["GET"],
+      allowOrigins: ["*"],
+      allowMethods: ["GET", "OPTIONS"],
     });
   }
 }
