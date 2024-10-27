@@ -1,30 +1,68 @@
-// Filename: Todo/handler.ts
 import { Handler } from "aws-lambda";
-import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
-// import { v4 as uuidv4 } from "uuid";
-import { randomUUID } from 'crypto';
+import { DynamoDBClient, ScanCommand } from "@aws-sdk/client-dynamodb";
 
-const dynamoDB = new DynamoDBClient({ region: process.env.AWS_REGION });
-const tableName = process.env.TABLE_NAME as string;
+const ProductTable = process.env.ProductTable as string;
+const StockTable = process.env.StockTable as string;
 
-export const addTodo: Handler = async (event, context) => {
+const client = new DynamoDBClient({
+  region: process.env.AWS_REGION,
+});
+
+export const getProductsWithStock: Handler = async (
+  event: any,
+  context: any
+) => {
   try {
-    const command = new PutItemCommand({
-      TableName: tableName,
-      Item: {
-        id: { S: randomUUID() },
-        createdAt: { N: new Date().getTime().toFixed() },
-        body: { S: event.todoBody },
-      },
-    });
+    const productStockList = await client.send(
+      new ScanCommand({
+        TableName: StockTable,
+      })
+    );
+    const productList = await client.send(
+      new ScanCommand({
+        TableName: ProductTable,
+      })
+    );
 
-    const result = await dynamoDB.send(command);
+    // product model
+    // {
+    //   createdAt: { S: '1729485152' },
+    //   id: { S: '2' },
+    //   description: { S: 'some desc' },
+    //   price: { N: '22.99' },
+    //   title: { S: 'DAYCO 5060495DR Drive Rite' }
+    // }
+    const result = [];
 
-    console.log("PutItem succeeded:", JSON.stringify(result, null, 2));
+    const productStock = productStockList?.Items;
+    const productItems = productList?.Items;
+    if (productStock && productItems) {
+      for (const productItem of productItems) {
+        const productId = productItem.id.S;
 
-    return result;
+        const stockItem = productStock.find(
+          (stockRecord) => stockRecord.product_id.S === productId
+        );
+
+        const count = stockItem?.count?.N;
+
+        result.push({
+          id: productId,
+          count,
+          price: productItem.price.N,
+          title: productItem.title.S,
+          description: productItem.description.S,
+        });
+      }
+    }
+
+    return { products: result };
   } catch (error) {
-    console.error("Error:", error);
-    throw new Error("Error adding item to DynamoDB table");
+    if (error instanceof Error) {
+      console.error("Error:", error.message);
+      return;
+    }
+
+    throw new Error("Something went wrong");
   }
 };
