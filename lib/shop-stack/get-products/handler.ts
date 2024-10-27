@@ -54,9 +54,19 @@ export const getProductsWithStock: Handler = async (
           description: productItem.description.S,
         });
       }
+    } else {
+      return {
+        data: [],
+        message: "No products available",
+        success: true,
+      };
     }
 
-    return { products: result };
+    return {
+      data: result,
+      message: "Successfully Fetched Products",
+      success: true,
+    };
   } catch (error) {
     if (error instanceof Error) {
       console.error("Error:", error.message);
