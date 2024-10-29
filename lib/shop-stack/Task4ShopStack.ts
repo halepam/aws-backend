@@ -63,6 +63,18 @@ export class Task4ShopStack extends Stack {
       }
     );
 
+    const addProductLambda = new lambda.Function(this, "add-product-function", {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      memorySize: 1024,
+      timeout: cdk.Duration.seconds(5),
+      handler: "handler.addProduct",
+      code: lambda.Code.fromAsset(join(__dirname, "./add-product")),
+      environment: {
+        ProductTable: ProductTableName,
+        StockTable: StockTableName,
+      },
+    });
+
     const productsLambdaIntegration = new apigateway.LambdaIntegration(
       getProductsLambda,
       {
@@ -89,6 +101,26 @@ export class Task4ShopStack extends Stack {
       }
     );
 
+    const addProductLambdaIntegration = new apigateway.LambdaIntegration(
+      addProductLambda,
+      {
+        requestTemplates: {
+          "application/json": `{ 
+            "title": "$input.params('title')", 
+            "description": "$input.params('description')",
+            "price": "$input.params('price')",
+            "count": "$input.params('count')"
+          }`,
+        },
+        integrationResponses: [
+          {
+            statusCode: "201",
+          },
+        ],
+        proxy: false,
+      }
+    );
+
     const productsResource = api.root.addResource("products");
     const productByIdResource = productsResource.addResource("{productId}");
 
@@ -100,9 +132,13 @@ export class Task4ShopStack extends Stack {
       methodResponses: [{ statusCode: "200" }],
     });
 
+    productsResource.addMethod("POST", addProductLambdaIntegration, {
+      methodResponses: [{ statusCode: "201" }],
+    });
+
     productsResource.addCorsPreflight({
       allowOrigins: ["*"],
-      allowMethods: ["GET", "OPTIONS"],
+      allowMethods: ["GET", "OPTIONS", "POST"],
     });
 
     productByIdResource.addCorsPreflight({
@@ -115,5 +151,8 @@ export class Task4ShopStack extends Stack {
 
     ProductTable.grantReadData(getProductByIdLambda);
     StockTable.grantReadData(getProductByIdLambda);
+
+    ProductTable.grantReadWriteData(addProductLambda);
+    StockTable.grantReadWriteData(addProductLambda);
   }
 }

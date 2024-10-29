@@ -37,30 +37,38 @@ export const getProductByIdWithStock: Handler = async (
     //   title: { S: 'DAYCO 5060495DR Drive Rite' }
     // }
     let result = {};
-
+    
+    
     const productStock = productStockList?.Items;
     const productItems = productList?.Items;
+    console.log("stock list", productStock)
     if (productStock && productItems) {
       const productItem = productItems.find(
         (item) => item.id.S === productIdParam
       );
       
       
+      
       if (productItem) {
+        console.log('found item', productItem);
         const productId = productItem.id.S;
         const stockItem = productStock.find(
           (stockRecord) => stockRecord.product_id.S === productId
         );
 
-        const count = stockItem?.count?.N;
+        console.log('found stock item', stockItem);
+
+        const count = stockItem?.count?.N || stockItem?.count?.S;
 
         result = {
           id: productId,
           count,
-          price: productItem.price.N,
+          price: productItem.price.N || productItem.price.S,
           title: productItem.title.S,
           description: productItem.description.S,
         };
+
+        console.log('result', result);
       }
     } else {
       return {
