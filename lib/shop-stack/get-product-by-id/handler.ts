@@ -37,26 +37,23 @@ export const getProductByIdWithStock: Handler = async (
     //   title: { S: 'DAYCO 5060495DR Drive Rite' }
     // }
     let result = {};
-    
-    
+
     const productStock = productStockList?.Items;
     const productItems = productList?.Items;
-    console.log("stock list", productStock)
+    console.log("stock list", productStock);
     if (productStock && productItems) {
       const productItem = productItems.find(
         (item) => item.id.S === productIdParam
       );
-      
-      
-      
+
       if (productItem) {
-        console.log('found item', productItem);
+        console.log("found item", productItem);
         const productId = productItem.id.S;
         const stockItem = productStock.find(
           (stockRecord) => stockRecord.product_id.S === productId
         );
 
-        console.log('found stock item', stockItem);
+        console.log("found stock item", stockItem);
 
         const count = stockItem?.count?.N || stockItem?.count?.S;
 
@@ -68,19 +65,15 @@ export const getProductByIdWithStock: Handler = async (
           description: productItem.description.S,
         };
 
-        console.log('result', result);
+        console.log("result", result);
       }
-    } else {
-      return {
-        data: {},
-        message: `Product with id: ${productIdParam} not found`,
-        success: false,
-      };
     }
 
     return {
       data: result,
-      message: "Successfully Fetched Product",
+      message: (!result || Object.keys(result).length === 0)
+        ? `Could not find product with id: ${productIdParam}`
+        : `Successfully fetched product with id: ${productIdParam} `,
       success: true,
     };
   } catch (error) {

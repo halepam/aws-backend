@@ -54,6 +54,7 @@ export const addProduct: Handler = async (event: any, context: any) => {
         title,
         description,
         price,
+        count,
         createdAt,        
       },
       message: "Successfully Created Product",

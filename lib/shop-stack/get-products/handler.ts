@@ -24,14 +24,6 @@ export const getProductsWithStock: Handler = async (
       })
     );
 
-    // product model
-    // {
-    //   createdAt: { S: '1729485152' },
-    //   id: { S: '2' },
-    //   description: { S: 'some desc' },
-    //   price: { N: '22.99' },
-    //   title: { S: 'DAYCO 5060495DR Drive Rite' }
-    // }
     const result = [];
 
     const productStock = productStockList?.Items;
@@ -44,7 +36,7 @@ export const getProductsWithStock: Handler = async (
           (stockRecord) => stockRecord.product_id.S === productId
         );
 
-        const count = stockItem?.count?.N;
+        const count = stockItem?.count?.N || stockItem?.count?.S;
 
         result.push({
           id: productId,
@@ -54,17 +46,14 @@ export const getProductsWithStock: Handler = async (
           description: productItem.description.S,
         });
       }
-    } else {
-      return {
-        data: [],
-        message: "No products available",
-        success: true,
-      };
     }
 
     return {
       data: result,
-      message: "Successfully Fetched Products",
+      message:
+        !result || result.length === 0
+          ? "No products available"
+          : "Successfully Fetched Products",
       success: true,
     };
   } catch (error) {

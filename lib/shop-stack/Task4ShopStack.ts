@@ -105,13 +105,17 @@ export class Task4ShopStack extends Stack {
       addProductLambda,
       {
         requestTemplates: {
-          "application/json": `{ 
-            "title": "$input.params('title')", 
-            "description": "$input.params('description')",
-            "price": "$input.params('price')",
-            "count": "$input.params('count')"
-          }`,
+          "application/json": `
+            #set($inputRoot = $input.path('$'))
+            { 
+              "title": "$inputRoot.title", 
+              "description": "$inputRoot.description",
+              "price": "$inputRoot.price",
+              "count": "$inputRoot.count"
+            }
+          `,
         },
+        
         integrationResponses: [
           {
             statusCode: "201",
