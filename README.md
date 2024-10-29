@@ -10,6 +10,17 @@ Endpoints are:
 - `getProductById`: `/{productId}` GET method
 - `createProduct`: `/products` POST method
 
+## Create Product Paylod
+In order to create a product, the following payload example can be used:
+`
+{
+    "title": "FVP 495K6 Multi-V",
+    "description": "some desc",
+    "price": 34.75,
+    "count": 10
+}
+`
+
 ## SUCCESS Response Examples
   - GET all products:
     `{
@@ -43,16 +54,7 @@ Endpoints are:
         "success": true
     }`
 
-## Create Product Paylod
-In order to create a product, the following payload example can be used:
-`
-{
-    "title": "FVP 495K6 Multi-V",
-    "description": "some desc",
-    "price": 34.75,
-    "count": 10
-}
-`
+
 
 ## Useful commands
 
