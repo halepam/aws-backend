@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import "source-map-support/register";
 import * as cdk from "aws-cdk-lib";
-import { Task4ShopStack } from "../lib/shop-stack/Task4ShopStack";
+import { HelloS3Stack } from "../lib/hello-s3-stack";
 
 const app = new cdk.App();
-new Task4ShopStack(app, 'Task4ShopStack');
+new HelloS3Stack(app, 'HelloS3Stack', {});
