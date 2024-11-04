@@ -4,7 +4,7 @@
 Client is integrated and available through: [https://d3j5zyjcx28byh.cloudfront.net/](https://d2h462pyzn3zmo.cloudfront.net/)
 
 ## API Gateway and Lambda Functions
-API URI is [https://rp0yrpnlxj.execute-api.us-east-1.amazonaws.com/prod](https://b5ej4pymjl.execute-api.us-east-1.amazonaws.com/prod/)
+API URI is [https://b5ej4pymjl.execute-api.us-east-1.amazonaws.com/prod](https://b5ej4pymjl.execute-api.us-east-1.amazonaws.com/prod)
 Endpoints are:
 - `getProductList`: `/products` GET method
 - `getProductById`: `/{productId}` GET method
