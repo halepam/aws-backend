@@ -1,8 +1,12 @@
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as cdk from "aws-cdk-lib";
 import * as s3deploy from "aws-cdk-lib/aws-s3-deployment";
+import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
+
 import path = require("path");
+const { join } = path;
 
 const S3_FOLDER_NAME = "uploaded";
 
@@ -12,13 +16,35 @@ export class Task5ImportServiceStack extends cdk.Stack {
 
     const bucket = new s3.Bucket(this, "ImportBucket", {
       bucketName: "task5-import-bucket",
-      removalPolicy: cdk.RemovalPolicy.DESTROY
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
-    new s3deploy.BucketDeployment(this, 'ImportServiceBucketDeployment', {
-        destinationBucket: bucket,
-        destinationKeyPrefix: S3_FOLDER_NAME,
-        sources: [s3deploy.Source.asset(path.join(__dirname, './uploaded'))]
-    })
+    new s3deploy.BucketDeployment(this, "ImportServiceBucketDeployment", {
+      destinationBucket: bucket,
+      destinationKeyPrefix: S3_FOLDER_NAME,
+      sources: [s3deploy.Source.asset(path.join(__dirname, "./uploaded"))],
+    });
+
+    const lambdaS3Role = new iam.Role(this, "LambdaS3Role", {
+      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
+    });
+
+    lambdaS3Role.addManagedPolicy(
+      iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonS3ReadOnlyAccess")
+    );
+
+    const importFileLambda = new lambda.Function(this, "import-file-function", {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      memorySize: 1024,
+      timeout: cdk.Duration.seconds(5),
+      handler: "handler.importFile",
+      code: lambda.Code.fromAsset(join(__dirname, "./import-file")),
+      role: lambdaS3Role,
+      environment: {
+        BucketName: bucket.bucketName,
+        FileName: 'products.csv',
+        Key: S3_FOLDER_NAME
+      }
+    });
   }
 }
