@@ -29,7 +29,10 @@ export class Task4ShopStack extends Stack {
     const api = new apigateway.RestApi(this, "products-api", {
       restApiName: "Products API Gateway",
       description: "This API serves the Lambda functions for products.",
-    });
+    });   
+    
+
+    
 
     const getProductsLambda = new lambda.Function(
       this,
@@ -126,6 +129,7 @@ export class Task4ShopStack extends Stack {
     );
 
     const productsResource = api.root.addResource("products");
+  
     const productByIdResource = productsResource.addResource("{productId}");
 
     productsResource.addMethod("GET", productsLambdaIntegration, {
