@@ -1,6 +1,6 @@
 # Task 5 Submission
 A continuation of the same source code of Task 4. 
-Included, you will find a stack called, ImportServiceStack, that will:
+Included, you will find a stack called, `ImportServiceStack`, that will:
 - automatically upload CSV files under the folder `uploaded` using the `ImportServiceBucketDeployment`
 - generate `signedUrls` for a given CSV file using the lambda function `importFileLambda`
 - it will add an S3 event trigger (S3.ObjectCreated.*) to a lambda function `importFileParserLambda`
